@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,10 +23,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * project.
  */
 public class Robot extends IterativeRobot {
+  //placeholder values
+  Joystick driveStick = new Joystick(0);
+  JoystickButton speedLimiter;
   WPI_TalonSRX fR;
   WPI_TalonSRX fL;
   WPI_TalonSRX bL;
   WPI_TalonSRX bR;
+  double leftPower = 0;
+  double rightPower = 0;
+  double speedLimit = 0.5;
 
  
   /**
@@ -34,9 +41,7 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotInit() {
-    //placeholder values
-    Joystick driveStick = new Joystick(0);
-    
+    speedLimiter = new JoystickButton(driveStick, 0);
     //placeholder values
     fR = new WPI_TalonSRX(0);
     fL = new WPI_TalonSRX(1);
@@ -54,6 +59,20 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotPeriodic() {
+    leftPower = driveStick.getX() + driveStick.getY();
+    rightPower = driveStick.getY() - driveStick.getX();
+    fR.set(speedLimit * rightPower);
+    fL.set(speedLimit * leftPower);
+    bR.set(speedLimit * rightPower);
+    bL.set(speedLimit * leftPower);
+
+    //sets speed limit
+    if(speedLimiter.get()){
+      speedLimit = 0.5;
+    }
+    else{
+      speedLimit = 1;
+    }
   }
 
   /**
